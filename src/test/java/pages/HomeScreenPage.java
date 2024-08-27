@@ -1,21 +1,26 @@
 package pages;
 
-import com.codeborne.selenide.CollectionCondition;
-import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import io.appium.java_client.AppiumBy;
 import io.qameta.allure.Step;
+import org.openqa.selenium.By;
+
+import java.util.List;
 
 import static com.codeborne.selenide.CollectionCondition.attributes;
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
 
 public class HomeScreenPage {
-    private final SelenideElement pageTitle = $(AppiumBy.cssSelector("[type=XCUIElementTypeStaticText]"));
-    private final SelenideElement tabBar = $(AppiumBy.cssSelector("[type=XCUIElementTypeTabBar]"));
-    private final ElementsCollection table = $$(AppiumBy.cssSelector("[type=XCUIElementTypeTable]"));
+    private final SelenideElement pageTitle = $(By.cssSelector("[type=XCUIElementTypeStaticText]"));
+    private final SelenideElement tabBar = $(By.cssSelector("[type=XCUIElementTypeTabBar]"));
+    private final SelenideElement table = $(By.cssSelector("[type=XCUIElementTypeTable]"));
+
+    private final By cell = By.cssSelector("[type=XCUIElementTypeCell]"),
+            text = By.cssSelector("[type=XCUIElementTypeStaticText]"),
+            cardImg = By.cssSelector("[type=XCUIElementTypeImage]"),
+            button = By.cssSelector("[type=XCUIElementTypeButton]");
+
 
     @Step("Проверить наличие заголовка")
     public HomeScreenPage checkMainTitle() {
@@ -26,7 +31,7 @@ public class HomeScreenPage {
 
     @Step("Проверить что блок с книгами не является пустым")
     public HomeScreenPage checkTableIsNotEmpty() {
-        table.shouldHave(CollectionCondition.sizeGreaterThan(0));
+        table.$$(cell).should(sizeGreaterThan(0));
         return this;
     }
 
@@ -34,8 +39,46 @@ public class HomeScreenPage {
     public HomeScreenPage checkTabBar() {
         String buttonOneName = "New";
         String buttonSecondName = "Search";
-        tabBar.findAll("[type=XCUIElementTypeButton]")
+        tabBar.$$(button)
                 .shouldHave(attributes("name", buttonOneName, buttonSecondName));
+        return this;
+    }
+
+    public List<SelenideElement> getCards() {
+        return table.$$(cell);
+    }
+    public HomeScreenPage cardShouldHaveImg(SelenideElement card) {
+        card.$(cardImg).should(exist);
+        return this;
+    }
+
+    public HomeScreenPage cardShouldHaveTitle(SelenideElement card, String title) {
+        card.$$(text).getFirst().shouldHave(text(title));
+        return this;
+    }
+
+    public HomeScreenPage cardShouldHaveDescription(SelenideElement card, String description) {
+        card.$$(text).get(1).shouldHave(exactText(description));
+        return this;
+    }
+
+    public HomeScreenPage cardShouldHavePrice(SelenideElement card, String price) {
+        card.$$(text).get(2).shouldHave(text(price));
+        return this;
+    }
+
+    public HomeScreenPage cardShouldHaveSeries(SelenideElement card, String series) {
+        card.$$(text).get(3).shouldHave(text(series));
+        return this;
+    }
+
+    public HomeScreenPage cardShouldHaveNumber(SelenideElement card, String number) {
+        card.$$(text).get(4).shouldHave(text(number));
+        return this;
+    }
+
+    public HomeScreenPage cardShouldHaveImageUrl(SelenideElement card) {
+        card.$(cardImg).should(exist);
         return this;
     }
 }
