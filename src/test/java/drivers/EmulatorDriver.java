@@ -11,6 +11,8 @@ import org.openqa.selenium.WebDriver;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import static io.appium.java_client.remote.AutomationName.IOS_XCUI_TEST;
@@ -35,8 +37,8 @@ public class EmulatorDriver implements WebDriverProvider {
     public static URL getAppiumServerUrl() {
         EmulatorConfig emulatorConfig = ConfigFactory.create(EmulatorConfig.class);
         try {
-            return new URL(emulatorConfig.appiumServer());
-        } catch (MalformedURLException e) {
+            return new URI(emulatorConfig.appiumServer()).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

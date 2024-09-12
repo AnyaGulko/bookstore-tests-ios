@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id "io.freefair.lombok" version "8.6"
     id 'io.qameta.allure' version '2.11.2'
 }
@@ -15,21 +15,21 @@ compileTestJava {
     options.encoding = 'UTF-8'
 }
 
-def allureVersion = "2.27.0",
-    selenideVersion = "6.13.0",
-    junitVersion = "5.10.0",
+def allureVersion = "2.29.0",
+    selenideVersion = "6.15.0",
+    junitVersion = "5.11.0",
     slf4jVersion = "2.0.7",
     assertJVersion = "3.6.1",
-    appiumVersion = "8.5.1",
+    appiumVersion = "8.6.0",
     ownerVersion = "1.0.12",
     commons = "1.15",
     commonsIo = "2.11.0"
 
 allure {
-    report {
-        version.set(allureVersion)
-    }
+    version.set(allureVersion)
     adapter {
+        allureJavaVersion.set(allureVersion)
+        aspectjVersion.set("1.9.5")
         aspectjWeaver.set(true)
         frameworks {
             junit5 {
@@ -41,18 +41,21 @@ allure {
 
 dependencies {
     runtimeOnly 'org.aspectj:aspectjweaver:1.9.22'
-    testImplementation(
-            "io.qameta.allure:allure-rest-assured:$allureVersion",
-            "io.qameta.allure:allure-selenide:$allureVersion",
-            "com.codeborne:selenide:$selenideVersion",
-            "org.junit.jupiter:junit-jupiter:$junitVersion",
-            "org.slf4j:slf4j-simple:$slf4jVersion",
-            "org.assertj:assertj-core:$assertJVersion",
-            "io.appium:java-client:$appiumVersion",
-            "org.aeonbits.owner:owner:$ownerVersion",
-            "commons-codec:commons-codec:$commons",
-            "commons-io:commons-io:$commonsIo"
-    )
+    testImplementation("io.qameta.allure:allure-rest-assured:$allureVersion")
+    testImplementation("io.qameta.allure:allure-selenide:$allureVersion")
+    testImplementation("com.codeborne:selenide:$selenideVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
+    testImplementation("org.slf4j:slf4j-simple:$slf4jVersion")
+    testImplementation("org.assertj:assertj-core:$assertJVersion")
+    testImplementation("io.appium:java-client:$appiumVersion")
+    testImplementation("org.aeonbits.owner:owner:$ownerVersion")
+    testImplementation("commons-codec:commons-codec:$commons")
+    testImplementation("commons-io:commons-io:$commonsIo")
+}
+
+test {
+    useJUnitPlatform()
+    systemProperties(System.getProperties())
 }
 
 tasks.withType(Test) {
@@ -64,5 +67,29 @@ tasks.withType(Test) {
             events "started", "skipped", "failed", "standard_error", "standard_out"
             exceptionFormat "short"
         }
+    }
+}
+
+task smoke_test(type: Test) {
+    useJUnitPlatform{
+        includeTags("smoke")
+    }
+}
+
+task regress_test(type: Test) {
+    useJUnitPlatform {
+        includeTags("regress")
+    }
+}
+
+task home_screen_test(type: Test) {
+    useJUnitPlatform{
+        includeTags("home_screen_tests")
+    }
+}
+
+task search_test(type: Test) {
+    useJUnitPlatform {
+        includeTags("search_tests")
     }
 }
